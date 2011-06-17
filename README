@@ -1,0 +1,26 @@
+
+A useful yet still extremely light-weight web client built on top of Ruby Net::HTTP
+Keeps certain information in a session for each host/port used
+Great for simple web page scraping or web service api usage
+
+Features:
+ * Supports ssl connections in a natural way
+ * Automatically uses keepalives if the server supports them
+ * Automatically uses cookies too (though currently ignores host/path/expires/secure options)
+ * Automatically follows redirects, up to a certain limit
+ * Automatically retries again if certain possibly transient errors happen, up to a limit
+
+Normal example usage, parses url to determine its behavior:
+ * HttpSession.get_request_url(url_string)
+ * HttpSession.get_request_url(url_string, headers_hash)
+ * HttpSession.post_request_url(url_string, post_params_hash)
+ * HttpSession.post_request_url(url_string, post_params_hash, headers_hash)
+
+Lower level examples, if your url is already broken down into pieces:
+ * HttpSession.use(host_string).request # defaults are: false, 80, and '/', {}, :get, {}
+ * HttpSession.use(host_string, use_ssl_boolean, port_integer).request(uri_string, headers_hash, get_or_post_symbol, post_params_hash)
+
+All the above return a Net::HTTPResponse object
+Or raise any of the following:
+ * Timeout::Error or SystemCallError subclass - for connection-related DNS, TCP/IP, etc issues
+ * Net::ProtocolError subclass - for HTTP response errors
