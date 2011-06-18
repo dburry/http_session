@@ -98,7 +98,12 @@ class HttpSession
   # 
   
   # store references to all currently-known session instances in here, for singleton method usage
-  cattr_accessor :sessions
+  def self.sessions
+    @@sessions
+  end
+  def self.sessions=(sesns)
+    @@sessions = sesns
+  end
   self.sessions = {}
   
   # storage for open session handle, for instance method usage
