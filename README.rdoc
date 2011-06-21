@@ -1,0 +1,48 @@
+
+= HttpSession
+
+A useful yet still extremely light-weight web client built on top of Ruby Net::HTTP.  Keeps certain information internally in a session for each host/port used.  Great for simple web page scraping or web service API usage.
+
+== Dependencies
+
+* Ruby 1.8.7 - 1.9.2
+
+== Features
+
+* Extremely light-weight, 100-200 lines of code
+* Supports GET and POST requests, including POST parameter data
+* Supports SSL connections in a natural way
+* Automatically uses KeepAlives if the server supports them
+* Automatically remembers Cookies for each session (though currently ignores host/path/expires/secure options)
+* Automatically follows Redirects, up to a certain limit
+* Automatically retries again if certain possibly transient errors happen, up to a limit.  Useful, for example, when the KeepAlive limit is reached and the server hangs up on you, it just retries and keeps going without missing a beat.
+* Supports additional headers for whatever simple additional HTTP features you may need.
+
+== Usage
+
+Normal example usage, parses url string to determine its behavior:
+* HttpSession.get_request_url(url_string)
+* HttpSession.get_request_url(url_string, headers_hash)
+* HttpSession.post_request_url(url_string, post_params_hash)
+* HttpSession.post_request_url(url_string, post_params_hash, headers_hash)
+
+Lower level examples, if your url is already broken down into pieces:
+* HttpSession.use(host_string).request # defaults are: false, 80, and '/', {}, :get, {}
+* HttpSession.use(host_string, use_ssl_boolean, port_integer).request(uri_string, headers_hash, get_or_post_symbol, post_params_hash)
+
+All the above return:
+* a Net::HTTPResponse object in all its glory
+
+Or raise any of the following:
+* Timeout::Error or SystemCallError subclass - for connection-related DNS, TCP/IP, etc issues
+* Net::ProtocolError subclass - for HTTP response errors
+
+Notes:
+* You do not need to check the response object for HTTP errors, they are raised automatically.  If you care about dealing with any of them, only then will you need to catch them.
+* A common pattern is to feed the response.body string into Nokogiri[http://nokogiri.org/] for further processing.
+
+== Alternatives
+
+Extremely light-weight libraries are great resource savers when you only need limited features.  But they're not for every situation.  Here are some other great alternatives:
+
+* Mechanize[http://mechanize.rubyforge.org/] - Much more fully-featured web page scraping library.
