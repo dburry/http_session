@@ -1,7 +1,7 @@
 
 = HttpSession
 
-A useful yet still extremely light-weight web client built on top of Ruby +Net::HTTP+.  Keeps certain information internally in a session for each host/port used.  Great for simple web page scraping or web service API usage.
+A useful yet still extremely light-weight web client built on top of Ruby <tt>Net::HTTP</tt>.  Keeps certain information internally in a session for each host/port used.  Great for simple web page scraping or web service API usage.
 
 == Dependencies
 
@@ -21,25 +21,25 @@ A useful yet still extremely light-weight web client built on top of Ruby +Net::
 == Usage
 
 Normal example usage, parses url string to determine its behavior:
-* +HttpSession.get_request_url(url_string)+
-* +HttpSession.get_request_url(url_string, headers_hash)+
-* +HttpSession.post_request_url(url_string, post_params_hash)+
-* +HttpSession.post_request_url(url_string, post_params_hash, headers_hash)+
+* <tt>HttpSession.get_request_url(url_string)</tt>
+* <tt>HttpSession.get_request_url(url_string, headers_hash)</tt>
+* <tt>HttpSession.post_request_url(url_string, post_params_hash)</tt>
+* <tt>HttpSession.post_request_url(url_string, post_params_hash, headers_hash)</tt>
 
 Lower level examples, if your url is already broken down into pieces:
-* +HttpSession.use(host_string).request+ # defaults are: false, 80, and '/', {}, :get, {}
-* +HttpSession.use(host_string, use_ssl_boolean, port_integer).request(uri_string, headers_hash, get_or_post_symbol, post_params_hash)+
+* <tt>HttpSession.use(host_string).request</tt> # defaults are: false, 80, and '/', {}, :get, {}
+* <tt>HttpSession.use(host_string, use_ssl_boolean, port_integer).request(uri_string, headers_hash, get_or_post_symbol, post_params_hash)</tt>
 
 All the above return:
-* a +Net::HTTPResponse+ object in all its glory
+* a <tt>Net::HTTPResponse</tt> object in all its glory
 
 Or raise any of the following:
-* +Timeout::Error+ or +SystemCallError+ subclass - for connection-related DNS, TCP/IP, etc issues
-* +Net::ProtocolError+ subclass - for HTTP response errors
+* <tt>Timeout::Error</tt> or <tt>SystemCallError</tt> subclass - for connection-related DNS, TCP/IP, etc issues
+* <tt>Net::ProtocolError</tt> subclass - for HTTP response errors
 
 Notes:
 * You do not need to check the response object for HTTP errors, they are raised automatically.  If you care about dealing with any of them, only then will you need to catch them.
-* A common pattern is to feed the response.body string into Nokogiri[http://nokogiri.org/] for further processing.
+* A common pattern is to feed the <tt>response.body</tt> string into Nokogiri[http://nokogiri.org/] for further processing.
 
 == Alternatives
 
