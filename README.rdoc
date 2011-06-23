@@ -41,6 +41,10 @@ Notes:
 * You do not need to check the response object for HTTP errors like <tt>404 "Not Found"</tt> or others, they are raised automatically, and can be caught when needed.  In my opinion this is better than how <tt>Net::HTTP</tt> behaves.
 * A common pattern is to feed the <tt>response_object.body</tt> string into Nokogiri[http://nokogiri.org/] for further processing.
 
+== Contributing
+
+If you think you found a bug or want a feature, get involved at http://github.com/dburry/http_session/issues  If you'd then like to contribute a patch, use Github's wonderful fork and pull request features.  Keep in mind that one of the main goals of this library is to remain light-weight, so more light-weight features or changes are most likely to be included.
+
 == Alternatives
 
 Light-weight libraries are great resource savers when you only need limited features.  But they're not for every situation.  Here are some other great alternatives:
