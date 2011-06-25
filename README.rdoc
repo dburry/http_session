@@ -5,7 +5,8 @@ A useful yet still extremely light-weight web client built on top of Ruby <tt>Ne
 
 == Dependencies
 
-* Ruby 1.8.7 - 1.9.2
+* just Ruby 1.8.6 - 1.9.2
+* no gem dependencies!
 
 == Features
 
@@ -43,7 +44,15 @@ Notes:
 
 == Contributing
 
-If you think you found a bug or want a feature, get involved at http://github.com/dburry/http_session/issues  If you'd then like to contribute a patch, use Github's wonderful fork and pull request features.  Keep in mind that one of the main goals of this library is to remain light-weight, so more light-weight features or changes are most likely to be included.
+If you think you found a bug or want a feature, get involved at http://github.com/dburry/http_session/issues  If you'd then like to contribute a patch, use Github's wonderful fork and pull request features.  Keep in mind that one of the main goals of this library is to remain light-weight, so changes done in this spirit are most likely to be included.
+
+To set up a full development environment:
+* <tt>git clone</tt> the repository,
+* have RVM[https://rvm.beginrescueend.com/] and Bundler[http://gembundler.com/] installed,
+* then cd into your repo (follow any RVM prompts if this is your first time using that),
+* and run <tt>bundle install</tt> to pull in all the rest of the development dependencies.
+* After that point, <tt>rake -T</tt> should be fairly self-explanatory.
+* Check out the <tt>rake -T rubies</tt> tasks for some neat multi-ruby-version setup and testing.
 
 == Alternatives
 
