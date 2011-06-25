@@ -63,7 +63,7 @@ if RUBY_VERSION =~ /^1\.8\./
   end
 end
 
-if RUBY_VERSION =~ /^1\.9\.2$/
+if RUBY_VERSION =~ /^1\.9/
   begin
     require 'rdoc/task'
   rescue LoadError
@@ -78,44 +78,46 @@ if RUBY_VERSION =~ /^1\.9\.2$/
   end
 end
 
-namespace :rubies do
-  @@ruby_versions = [
-    # edit this list to test on more rubies...
-    # though beware that some development dependencies might be troublesome on some versions...
-    'ruby-1.9.2-p180',
-    'ruby-1.9.1-p378',
-    'ruby-1.8.7-p330',
-    'ruby-1.8.6-p399'
-  ]
-  def installed_ruby_versions
-    current_rubies = `rvm list`
-    ruby_version_gemsets_string = @@ruby_versions.select { |r| current_rubies =~ /\b#{r}\b/ }
-  end
-  def missing_ruby_versions
-    current_rubies = `rvm list`
-    ruby_version_gemsets_string = @@ruby_versions.select { |r| current_rubies !~ /\b#{r}\b/ }
-  end
-  desc "List all the versions of Ruby these tasks use"
-  task :list do
-    @@ruby_versions.each { |r| puts r }
-  end
-  desc "Setup multiple versions of Ruby for testing, and populate an RVM gemset for each"
-  task :setup do
-    missing = missing_ruby_versions
-    system "rvm install #{missing.join(',')}" unless missing.empty?
-    ruby_version_gemsets_string = @@ruby_versions.collect { |r| r + '@http_session' }.join(',')
-    system "rvm --create #{ruby_version_gemsets_string} gem install bundler"
-    system "rvm #{ruby_version_gemsets_string} exec bundle install"
-  end
-  desc "Remove RVM gemsets (leave the Ruby versions installed though)"
-  task :cleanup do
-    installed_ruby_versions.each { |r| system "rvm --force #{r} gemset delete http_session" }
-  end
-  desc "Run tests on multiple versions of Ruby, using RVM"
-  task :test do
-    installed = installed_ruby_versions
-    puts "WARNING: some rubies are missing from RVM, run `rake rubies:setup` to install them" if installed != @@ruby_versions
-    ruby_version_gemsets_string = installed.collect { |r| r + '@http_session' }.join(',')
-    system "rvm #{ruby_version_gemsets_string} exec rake test"
+unless `which rvm`.empty?
+  namespace :rubies do
+    @@ruby_versions = [
+      # edit this list to test on more rubies...
+      # though beware that some development dependencies might be troublesome on some versions...
+      'ruby-1.9.2-p180',
+      'ruby-1.9.1-p378',
+      'ruby-1.8.7-p330',
+      'ruby-1.8.6-p399'
+    ]
+    def installed_ruby_versions
+      current_rubies = `rvm list`
+      ruby_version_gemsets_string = @@ruby_versions.select { |r| current_rubies =~ /\b#{r}\b/ }
+    end
+    def missing_ruby_versions
+      current_rubies = `rvm list`
+      ruby_version_gemsets_string = @@ruby_versions.select { |r| current_rubies !~ /\b#{r}\b/ }
+    end
+    desc "List all the versions of Ruby these tasks use"
+    task :list do
+      @@ruby_versions.each { |r| puts r }
+    end
+    desc "Setup multiple versions of Ruby for testing, and populate an RVM gemset for each"
+    task :setup do
+      missing = missing_ruby_versions
+      system "rvm install #{missing.join(',')}" unless missing.empty?
+      ruby_version_gemsets_string = @@ruby_versions.collect { |r| r + '@http_session' }.join(',')
+      system "rvm --create #{ruby_version_gemsets_string} gem install bundler"
+      system "rvm #{ruby_version_gemsets_string} exec bundle install"
+    end
+    desc "Remove RVM gemsets (leave the Ruby versions installed though)"
+    task :cleanup do
+      installed_ruby_versions.each { |r| system "rvm --force #{r} gemset delete http_session" }
+    end
+    desc "Run tests on multiple versions of Ruby, using RVM"
+    task :test do
+      installed = installed_ruby_versions
+      puts "WARNING: some rubies are missing from RVM, run `rake rubies:setup` to install them" if installed != @@ruby_versions
+      ruby_version_gemsets_string = installed.collect { |r| r + '@http_session' }.join(',')
+      system "rvm #{ruby_version_gemsets_string} exec rake test"
+    end
   end
 end
