@@ -128,7 +128,8 @@ class HttpSession
     self.handle.close_on_empty_response = true     # seems to have no effect?
     if use_ssl
       self.handle.use_ssl       = true
-      self.handle.ssl_timeout   = @@ssl_timeout
+      # respond_to? check is a ruby-1.9.1-p378 (+/-?) bug workaround
+      self.handle.ssl_timeout   = @@ssl_timeout if OpenSSL::SSL::SSLContext.new.respond_to?(:ssl_timeout=)
       self.handle.verify_mode   = @@ssl_verify_mode
       self.handle.ca_file       = @@ssl_ca_file
       self.handle.verify_depth  = @@ssl_verify_depth
