@@ -22,21 +22,23 @@ A useful yet still extremely light-weight web client built on top of Ruby <tt>Ne
 == Usage
 
 Normal example usage, parses url string to determine its behavior:
-* <tt>response_object = HttpSession.get_request_url(url_string)</tt>
-* <tt>response_object = HttpSession.get_request_url(url_string, headers_hash)</tt>
-* <tt>response_object = HttpSession.post_request_url(url_string, post_params_hash)</tt>
-* <tt>response_object = HttpSession.post_request_url(url_string, post_params_hash, headers_hash)</tt>
+
+  response_object = HttpSession.get_request_url(url_string)
+  response_object = HttpSession.get_request_url(url_string, headers_hash)
+  response_object = HttpSession.post_request_url(url_string, post_params_hash)
+  response_object = HttpSession.post_request_url(url_string, post_params_hash, headers_hash)
 
 Lower level examples, if your url is already broken down into pieces:
-* <tt>response_object = HttpSession.use(host_string).request</tt> # defaults are: <tt>false, 80</tt>, and <tt>'/', {}, :get, {}</tt>
-* <tt>response_object = HttpSession.use(host_string, use_ssl_boolean, port_integer).request(uri_string, headers_hash, get_or_post_symbol, post_params_hash)</tt>
+
+  response_object = HttpSession.use(host_string).request # defaults are: false, 80, and '/', {}, :get, {}
+  response_object = HttpSession.use(host_string, use_ssl_boolean, port_integer).request(uri_string, headers_hash, get_or_post_symbol, post_params_hash)
 
 All the above return:
 * a <tt>Net::HTTPResponse</tt> object in all its glory
 
 Or raise any of the following:
-* <tt>Timeout::Error</tt> or <tt>SystemCallError</tt> subclass - for connection-related DNS, TCP/IP, etc issues
-* <tt>Net::ProtocolError</tt> subclass - for HTTP response errors
+* <tt>Timeout::Error</tt> or <tt>Errno::*</tt> (<tt>SystemCallError</tt> subclass) or <tt>OpenSSL::SSL::SSLError</tt> - for various connection-related issues
+* <tt>Net::HTTP*Error/Exception</tt> (<tt>Net::ProtocolError</tt> subclass) - for HTTP response errors
 
 Notes:
 * You do not need to check the response object for HTTP errors like <tt>404 "Not Found"</tt> or others, they are raised automatically, and can be caught when needed.  In my opinion this is better than how <tt>Net::HTTP</tt> behaves.

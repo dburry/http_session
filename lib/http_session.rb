@@ -83,7 +83,7 @@ class HttpSession
     req.set_form_data(post_params) if type == :post
     
     begin
-      handle.start unless handle.started? # may raise Timeout::Error
+      handle.start unless handle.started? # may raise Timeout::Error or OpenSSL::SSL::SSLError
       response = handle.request(req) # may raise Errno::* (subclasses of SystemCallError)
     rescue Timeout::Error, SystemCallError
       handle.finish if handle.started?
