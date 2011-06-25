@@ -45,4 +45,61 @@ class TestHttpSession < Test::Unit::TestCase
     end
     
   end
+  
+  context 'server' do
+    teardown { stop_server }
+    
+    context 'basic' do
+      setup { start_server { |server| server.mount_proc('/ping', Proc.new { |req, resp| resp.body = 'pong' }) } }
+      should('get_request_url') { assert_equal 'pong', HttpSession.get_request_url("http://localhost:#{TEST_SERVER_PORT}/ping").body }
+      should('use/request') { assert_equal 'pong', HttpSession.use('localhost', false, TEST_SERVER_PORT).request('/ping').body }
+      should('post_request_url') { assert_equal 'pong', HttpSession.post_request_url("http://localhost:#{TEST_SERVER_PORT}/ping", {'foo' => 'bar'}).body }
+      should('use/request post') { assert_equal 'pong', HttpSession.use('localhost', false, TEST_SERVER_PORT).request('/ping', {}, :post, {'foo' => 'bar'}).body }
+    end
+    
+    context 'redirect 10x' do
+      setup do
+        start_server do |server|
+          redircount = 0
+          server.mount_proc('/ping', Proc.new { |req, resp| resp.body = 'pong' })
+          server.mount_proc('/redir', Proc.new { |req, resp|
+            where = redircount < 9 ? 'redir' : 'ping' # add one for the last redirect to the ping
+            redircount += 1
+            resp.set_redirect(::WEBrick::HTTPStatus::Found, "http://localhost:#{TEST_SERVER_PORT}/#{where}")
+          })
+        end
+      end
+      should('work') { assert_equal 'pong', HttpSession.get_request_url("http://localhost:#{TEST_SERVER_PORT}/redir").body }
+    end
+    
+    context 'redirect 11x' do
+      setup do
+        start_server do |server|
+          redircount = 0
+          server.mount_proc('/ping', Proc.new { |req, resp| resp.body = 'pong' })
+          server.mount_proc('/redir', Proc.new { |req, resp|
+            where = ((redircount < 10) ? 'redir' : 'ping')
+            redircount += 1
+            resp.set_redirect(::WEBrick::HTTPStatus::Found, "http://localhost:#{TEST_SERVER_PORT}/#{where}")
+          })
+        end
+      end
+      # should 'fail'  do
+      #   assert_raise(Net::HTTPError) do
+      #     HttpSession.get_request_url("http://localhost:#{TEST_SERVER_PORT}/redir")
+      #   end
+      # end
+      # assert_raise can only check instance, not message... so we do this much longer thing instead:
+      should 'fail with message' do
+        begin
+          HttpSession.get_request_url("http://localhost:#{TEST_SERVER_PORT}/redir")
+        rescue Net::HTTPError => e
+          assert_equal('Redirection limit exceeded', e.message)
+        else
+          fail 'nothing was raised'
+        end
+      end
+    end
+    
+  end
 end

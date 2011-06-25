@@ -62,7 +62,7 @@ class HttpSession
       else
         raise ArgumentError, "bad type: #{type}"
     end
-    headers.each { |k, v| req[k] = v } unless headers.blank?
+    headers.each { |k, v| req[k] = v } unless headers.empty?
     req['Cookie'] = cookie_string if cookies?
     req.set_form_data(post_params) if type == :post
     
@@ -155,8 +155,8 @@ class HttpSession
   
   # delete session from session storage (you should probably call close on it too, and set all references to nil so it gets garbage collected)
   def delete
-    key = key(handle.address, handle.use_ssl?, handle.port)
-    self.class.sessions.delete[key] if self.class.sessions.has_key?(key)
+    key = self.class.key(handle.address, handle.use_ssl?, handle.port)
+    self.class.sessions.delete(key) if self.class.sessions.has_key?(key)
   end
   
   # return the given port, or defaults for ssl setting if it's nil
