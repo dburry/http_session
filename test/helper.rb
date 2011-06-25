@@ -64,7 +64,7 @@ class Test::Unit::TestCase
   
   # stop the simple webrick server
   def stop_server
-    unless @wbthread.nil?
+    if ! @wbthread.nil? && @wbthread.alive?
       # signal server thread to quit
       Process.kill('USR1', Process.pid)
       # wait for it to actually quit
@@ -72,7 +72,6 @@ class Test::Unit::TestCase
       # when that happens just comment out to see more debug info what's wrong
       # you'll also get some spurrious concurrency errors of course, but at least the problem will show up too
       @wbthread.join
-      @wbthread = nil
     end
   end
   
