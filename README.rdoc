@@ -54,6 +54,8 @@ To set up a full development environment:
 * After that point, <tt>rake -T</tt> should be fairly self-explanatory.
 * Check out the <tt>rake -T rubies</tt> tasks for some neat multi-ruby-version setup and testing.
 
+Note: If <tt>rake -T</tt> doesn't show much, then you are probably missing some of the requirements.  Perhaps you did not install RVM, or run <tt>bundle install</tt> correctly, or you do not have the right Ruby version or gemset installed/selected with RVM.  You can either correct this the normal way, or (if you have RVM) run the <tt>rake rubies:setup</tt> task, which makes sure several different versions of Ruby are intalled and sets up a nicely configured gemset in each for you.  You can then use RVM to switch between them for manually testing or running anything you want in any version (although the <tt>.rvmrc</tt> chooses Ruby 1.9.2 for you currently).
+
 == Alternatives
 
 Light-weight libraries are great resource savers when you only need limited features.  But they're not for every situation.  Here are some other great alternatives:
