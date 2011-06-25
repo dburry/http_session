@@ -6,7 +6,7 @@ A useful yet still extremely light-weight web client built on top of Ruby <tt>Ne
 == Dependencies
 
 * just Ruby 1.8.6 - 1.9.2
-* no gem dependencies!
+* no third party gem dependencies!
 
 == Features
 
