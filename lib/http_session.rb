@@ -54,21 +54,21 @@ class HttpSession
   # 
   
   # shortcut for parsing a full url and performing simple GET requests
-  # returns Net::HTTPResponse, or raises Timeout::Error, SystemCallError, Net::ProtocolError
+  # returns Net::HTTPResponse, or raises Timeout::Error, SystemCallError, Net::ProtocolError, OpenSSL::SSL::SSLError
   def self.get_request_url(url, headers={})
     parsed = URI.parse(url)
     use(parsed.host, parsed.scheme == 'https', parsed.port).request(parsed.path + (parsed.query.nil? ? '' : "?#{parsed.query}"), headers)
   end
   
   # shortcut for parsing a full url and performing simple POST requests
-  # returns Net::HTTPResponse, or raises Timeout::Error, SystemCallError, Net::ProtocolError
+  # returns Net::HTTPResponse, or raises Timeout::Error, SystemCallError, Net::ProtocolError, OpenSSL::SSL::SSLError
   def self.post_request_url(url, params, headers={})
     parsed = URI.parse(url)
     use(parsed.host, parsed.scheme == 'https', parsed.port).request(parsed.path + (parsed.query.nil? ? '' : "?#{parsed.query}"), headers, :post, params)
   end
   
   # internally handle GET and POST requests (recursively for redirects and retries)
-  # returns Net::HTTPResponse, or raises Timeout::Error, SystemCallError, Net::ProtocolError
+  # returns Net::HTTPResponse, or raises Timeout::Error, SystemCallError, Net::ProtocolError, OpenSSL::SSL::SSLError
   def request(uri='/', headers={}, type=:get, post_params={}, redirect_limit=@@redirect_limit, retry_limit=@@retry_limit)
     req = case type
       when :get
