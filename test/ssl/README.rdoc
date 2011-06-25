@@ -1,0 +1,32 @@
+= How to update these files
+
+These files are only good for so many years, and then they need to be updated... it is set to a very long time because they are only for testing purposes not for actual use of course.
+
+== Generate your own CA (Certificate Authority):
+
+  openssl genrsa -des3 -out ca.key 4096
+  openssl req -new -x509 -days 3650 -key ca.key -out ca.crt
+
+password is 1234
+
+== Generate a server key and request for signing (csr):
+
+  openssl genrsa -des3 -out server.key 4096
+  openssl req -new -key server.key -out server.csr
+
+CN must match host name or IP i.e. localhost, and must be different from CA's CN
+
+== Sign the certificate signing request (csr) with the self-created Certificate Authority (CA) that you made earlier:
+
+  openssl x509 -req -days 3650 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
+
+increment serial each time it's updated
+
+== Convert server.key into a password-less one:
+
+  openssl rsa -in server.key -out server.key.insecure
+  mv server.key.insecure server.key
+
+that's it! :)
+
+reference used: http://www.tc.umn.edu/~brams006/selfsign.html

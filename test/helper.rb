@@ -17,12 +17,14 @@ require 'http_session'
 require 'webrick'
 TEST_SERVER_PORT = 8081
 require 'thread'
+require 'webrick/https'
+require 'openssl'
 
 class Test::Unit::TestCase
   
   # start a simple webrick server that runs the given servlet and other options for testing
   @wbthread = nil
-  def start_server(config={})
+  def start_server(use_ssl=false, config={})
     # always run on this port
     config.update(:Port => TEST_SERVER_PORT)
     # for debugging the server itself, log debug output to stderr
@@ -32,6 +34,16 @@ class Test::Unit::TestCase
     config.update(:AccessLog => [ [ File.open('/dev/null', 'w'), ::WEBrick::AccessLog::COMBINED_LOG_FORMAT ] ])
     # don't ever process any requests in parallel, always run each test one at a time
     config.update(:MaxClients => 1)
+    
+    if use_ssl
+      # configure server to run with SSL
+      config.update(:SSLEnable => true)
+      config.update(:SSLVerifyClient => ::OpenSSL::SSL::VERIFY_NONE)
+      config.update(:SSLCertificate => ::OpenSSL::X509::Certificate.new(File.open(File.expand_path('../ssl/server.crt',  __FILE__)).read))
+      config.update(:SSLPrivateKey => ::OpenSSL::PKey::RSA.new(File.open(File.expand_path('../ssl/server.key',  __FILE__)).read))
+      config.update(:SSLCertName => [ [ "CN", 'localhost' ] ])
+      # puts ::WEBrick::Utils::getservername
+    end
     
     # create the server
     server = ::WEBrick::HTTPServer.new(config)

@@ -209,7 +209,45 @@ class TestHttpSession < Test::Unit::TestCase
       end
     end
     
-    # TODO: test SSL!
+    context 'ssl with self signed cert' do
+      teardown do
+        # make sure everything's forgotten about these, since we keep changing important ssl connection stuff here...
+        sesn = HttpSession.get('localhost', true, TEST_SERVER_PORT)
+        sesn.close
+        sesn.delete
+      end
+      
+      context 'with verification disabled' do
+        setup do
+          HttpSession.ssl_verify_mode = OpenSSL::SSL::VERIFY_NONE
+          start_server(true) { |server| server.mount_proc('/ping', Proc.new { |req, resp| resp.body = 'pong' }) }
+        end
+        should('work') { assert_equal 'pong', HttpSession.get_request_url("https://localhost:#{TEST_SERVER_PORT}/ping").body }
+      end
+      
+      context 'with verifying ca set' do
+        setup do
+          HttpSession.ssl_ca_file = File.expand_path('../ssl/ca.crt',  __FILE__)
+          start_server(true) { |server| server.mount_proc('/ping', Proc.new { |req, resp| resp.body = 'pong' }) }
+        end
+        should('work') { assert_equal 'pong', HttpSession.get_request_url("https://localhost:#{TEST_SERVER_PORT}/ping").body }
+      end
+      
+      context 'with default ca bundle' do
+        setup { start_server(true) { |server| server.mount_proc('/ping', Proc.new { |req, resp| resp.body = 'pong' }) } }
+        should 'fail verification' do
+          begin
+            HttpSession.get_request_url("https://localhost:#{TEST_SERVER_PORT}/ping")
+          rescue OpenSSL::SSL::SSLError => e
+            assert_match(/certificate verify failed/, e.message)
+          else
+            fail 'nothing was raised'
+          end
+        end
+      end
+      
+    end
+    
     # TODO: test retry_limit
     # TODO: test keepalives!
   end
