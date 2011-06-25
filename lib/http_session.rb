@@ -84,8 +84,8 @@ class HttpSession
     
     begin
       handle.start unless handle.started? # may raise Timeout::Error or OpenSSL::SSL::SSLError
-      response = handle.request(req) # may raise Errno::* (subclasses of SystemCallError)
-    rescue Timeout::Error, SystemCallError
+      response = handle.request(req) # may raise Errno::* (subclasses of SystemCallError) or EOFError
+    rescue Timeout::Error, SystemCallError, EOFError
       handle.finish if handle.started?
       raise if retry_limit == 0
       request(uri, headers, type, post_params, redirect_limit, retry_limit - 1)
