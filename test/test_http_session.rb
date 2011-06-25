@@ -59,8 +59,8 @@ class TestHttpSession < Test::Unit::TestCase
       end
       should 'two' do
         @c.cookies['one'] = 'two'
-        # splits into a set to compare because the order is not guaranteed...
-        assert_equal Set.new(['foo=bar', 'one=two']), Set.new(@c.cookie_string.split(', '))
+        assert @c.cookie_string.split(', ').include?('foo=bar')
+        assert @c.cookie_string.split(', ').include?('one=two')
       end
     end
     

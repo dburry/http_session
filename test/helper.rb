@@ -1,24 +1,32 @@
 require 'rubygems'
-require 'bundler'
-begin
-  Bundler.setup(:default, :development)
-rescue Bundler::BundlerError => e
-  $stderr.puts e.message
-  $stderr.puts "Run `bundle install` to install missing gems"
-  exit e.status_code
-end
+
+# require 'bundler'
+# begin
+#   Bundler.setup(:default, :development)
+# rescue Bundler::BundlerError => e
+#   $stderr.puts e.message
+#   $stderr.puts "Run `bundle install` to install missing gems"
+#   exit e.status_code
+# end
+
 require 'test/unit'
-require 'shoulda'
+begin
+  require 'shoulda'
+rescue LoadError
+  puts 'WARNING: missing shoulda library, cannot continue run tests'
+  exit
+end
+
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'http_session'
 
 require 'webrick'
-TEST_SERVER_PORT = 8081
-require 'thread'
 require 'webrick/https'
 require 'openssl'
+require 'thread'
+TEST_SERVER_PORT = 8081
 
 class Test::Unit::TestCase
   

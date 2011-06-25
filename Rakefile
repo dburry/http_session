@@ -23,6 +23,7 @@ require 'rake'
 begin
   require 'jeweler'
 rescue LoadError
+  puts 'WARNING: missing jeweler library, some tasks are not available'
 else
   Jeweler::Tasks.new do |gem|
     # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
@@ -40,6 +41,7 @@ end
 begin
   require 'rake/testtask'
 rescue LoadError
+  puts 'WARNING: missing test library, some tasks are not available'
 else
   task :default => :test
   Rake::TestTask.new(:test) do |test|
@@ -53,6 +55,7 @@ if RUBY_VERSION =~ /^1\.8\./
   begin
     require 'rcov/rcovtask'
   rescue LoadError
+    puts 'WARNING: missing rcov library, some tasks are not available'
   else
     Rcov::RcovTask.new do |test|
       test.libs << 'test'
@@ -67,6 +70,7 @@ if RUBY_VERSION =~ /^1\.9/
   begin
     require 'rdoc/task'
   rescue LoadError
+    puts 'WARNING: missing rdoc library, some tasks are not available'
   else
     RDoc::Task.new do |rdoc|
       version = File.exist?('VERSION') ? File.read('VERSION') : ""
@@ -78,7 +82,10 @@ if RUBY_VERSION =~ /^1\.9/
   end
 end
 
-unless `which rvm`.empty?
+if `which rvm`.empty?
+  puts 'WARNING: missing rvm executable, some tasks are not available'
+else
+  task :rubies => 'rubies:list'
   namespace :rubies do
     @@ruby_versions = [
       # edit this list to test on more rubies...
@@ -98,6 +105,7 @@ unless `which rvm`.empty?
     end
     desc "List all the versions of Ruby these tasks use"
     task :list do
+      puts 'The following Ruby versions are used in testing:'
       @@ruby_versions.each { |r| puts r }
     end
     desc "Setup multiple versions of Ruby for testing, and populate an RVM gemset for each"
