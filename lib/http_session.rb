@@ -82,6 +82,7 @@ class HttpSession
         if loc.scheme && loc.host && loc.port
           self.class.use(loc.host, loc.scheme == 'https', loc.port).request(loc.path + (loc.query.nil? ? '' : "?#{loc.query}"), headers, :get, {}, redirect_limit - 1)
         else
+          # only really bad web servers would ever send this... since it's not technically a valid value!
           request(loc.path + (loc.query.nil? ? '' : "?#{loc.query}"), headers, :get, {}, redirect_limit - 1)
         end
       else
