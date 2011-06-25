@@ -9,6 +9,13 @@ require 'rubygems'
 #   exit e.status_code
 # end
 
+if ENV.has_key?('USE_SIMPLECOV')
+  require 'simplecov'
+  SimpleCov.start do
+    add_group 'Libraries', 'lib'
+  end
+end
+
 require 'test/unit'
 begin
   require 'shoulda'
@@ -17,16 +24,15 @@ rescue LoadError
   exit
 end
 
-
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-require 'http_session'
-
 require 'webrick'
 require 'webrick/https'
 require 'openssl'
 require 'thread'
 TEST_SERVER_PORT = 8081
+
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+$LOAD_PATH.unshift(File.dirname(__FILE__))
+require 'http_session'
 
 class Test::Unit::TestCase
   
