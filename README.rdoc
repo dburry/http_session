@@ -30,8 +30,11 @@ Normal example usage, parses url string to determine its behavior:
 
 Lower level examples, if your url is already broken down into pieces:
 
-  response_object = HttpSession.use(host_string).request # defaults are: false, 80, and '/', {}, :get, {}
-  response_object = HttpSession.use(host_string, use_ssl_boolean, port_integer).request(uri_string, headers_hash, get_or_post_symbol, post_params_hash)
+  session_object  = HttpSession.use(host_string, use_ssl_boolean, port_integer)
+  response_object = session_object.request(uri_string, headers_hash, get_or_post_symbol, post_params_hash)
+  
+  session_object  = HttpSession.use(host_string)  # defaults are: false, 80 (or 443 if use_ssl is true)
+  response_object = session_object.request        # defaults are: '/', {}, :get, {}
 
 All the above return:
 * a <tt>Net::HTTPResponse</tt> object in all its glory
