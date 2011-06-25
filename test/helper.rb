@@ -42,7 +42,6 @@ class Test::Unit::TestCase
       config.update(:SSLCertificate => ::OpenSSL::X509::Certificate.new(File.open(File.expand_path('../ssl/server.crt',  __FILE__)).read))
       config.update(:SSLPrivateKey => ::OpenSSL::PKey::RSA.new(File.open(File.expand_path('../ssl/server.key',  __FILE__)).read))
       config.update(:SSLCertName => [ [ "CN", 'localhost' ] ])
-      # puts ::WEBrick::Utils::getservername
     end
     
     # create the server
