@@ -248,7 +248,45 @@ class TestHttpSession < Test::Unit::TestCase
       
     end
     
+    context 'when monitoring socket accepts' do
+      setup do
+        # start a server that counts each time it accepts a socket connection
+        @acpt_count = 0
+        start_server(false, {:AcceptCallback => Proc.new { |sock| @acpt_count += 1 }}) do |server|
+          server.mount_proc('/ping', Proc.new { |req, resp| resp.body = 'pong' })
+        end
+        # make sure client connection is fresh
+        @sesn = HttpSession.use('localhost', false, TEST_SERVER_PORT)
+        @sesn.close if @sesn.handle.started?
+      end
+      teardown do
+        @sesn.close
+      end
+      
+      should 'still have an open handle and reuse it via keepalives' do
+        assert_equal false, @sesn.handle.started?
+        assert_equal 0, @acpt_count
+        assert_equal 'pong', @sesn.request('/ping').body
+        assert_equal true, @sesn.handle.started?
+        assert_equal 1, @acpt_count
+        assert_equal 'pong', @sesn.request('/ping').body
+        assert_equal true, @sesn.handle.started?
+        assert_equal 1, @acpt_count
+      end
+      
+      should 'disable keepalive with connection close' do
+        assert_equal false, @sesn.handle.started?
+        assert_equal 0, @acpt_count
+        assert_equal 'pong', @sesn.request('/ping', {'connection' => 'close'}).body
+        assert_equal true, @sesn.handle.started?
+        assert_equal 1, @acpt_count
+        assert_equal 'pong', @sesn.request('/ping').body
+        assert_equal true, @sesn.handle.started?
+        assert_equal 2, @acpt_count
+      end
+      
+    end
+    
     # TODO: test retry_limit
-    # TODO: test keepalives!
   end
 end
