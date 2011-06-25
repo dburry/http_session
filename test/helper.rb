@@ -68,7 +68,11 @@ class Test::Unit::TestCase
       # signal server thread to quit
       Process.kill('USR1', Process.pid)
       # wait for it to actually quit
+      # note: Sometimes it appears to hang here at this join, when there's something wrong with the server or client
+      # when that happens just comment out to see more debug info what's wrong
+      # you'll also get some spurrious concurrency errors of course, but at least the problem will show up too
       @wbthread.join
+      @wbthread = nil
     end
   end
   
