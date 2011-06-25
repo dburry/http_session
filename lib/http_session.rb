@@ -4,33 +4,57 @@ require 'net/https'
 
 class HttpSession
   
-  # timeout for opening tcp/ip connection, in seconds
-  OPEN_TIMEOUT      =  4
-  
-  # timeout for reading bytes from tcp/ip connection, in seconds
-  READ_TIMEOUT      =  8
-  
-  # number of redirects to follow before throwing an error
-  REDIRECT_LIMIT    = 10
-  
-  # number of times to retry, on connection errors
-  RETRY_LIMIT       =  1
-  
-  # whether to assume to use ssl by default or not (normally should be false)
-  DEFAULT_USE_SSL   = false
-  
-  # ssl timeout
-  SSL_TIMEOUT       =  2
-  
-  # kind of ssl certificate verification (should be OpenSSL::SSL::VERIFY_NONE or OpenSSL::SSL::VERIFY_PEER)
-  SSL_VERIFY_MODE   = OpenSSL::SSL::VERIFY_PEER
-  
+  # default timeout for opening tcp/ip connection, in seconds
+  DEFAULT_OPEN_TIMEOUT      =  4
+  # default timeout for reading bytes from tcp/ip connection, in seconds
+  DEFAULT_READ_TIMEOUT      =  8
+  # default number of redirects to follow before throwing an error
+  DEFAULT_REDIRECT_LIMIT    = 10
+  # default number of times to retry, on connection errors
+  DEFAULT_RETRY_LIMIT       =  1
+  # default ssl timeout
+  DEFAULT_SSL_TIMEOUT       =  2
+  # default kind of ssl certificate verification (should be OpenSSL::SSL::VERIFY_NONE or OpenSSL::SSL::VERIFY_PEER)
+  DEFAULT_SSL_VERIFY_MODE   = OpenSSL::SSL::VERIFY_PEER
   # when ssl certificate verification is used, where is the certificate authority file
   # you can get one from curl here: http://curl.haxx.se/ca/cacert.pem
-  SSL_CA_FILE       = ::File.expand_path('../../share/ca/cacert.pem',  __FILE__)
+  DEFAULT_SSL_CA_FILE       = ::File.expand_path('../../share/ca/cacert.pem',  __FILE__)
+  # default ssl verify depth
+  DEFAULT_SSL_VERIFY_DEPTH  =  5
   
-  # ssl verify depth
-  SSL_VERIFY_DEPTH  =  5
+  def self.open_timeout=(v)
+    @@open_timeout = v
+  end
+  def self.read_timeout=(v)
+    @@read_timeout = v
+  end
+  def self.redirect_limit=(v)
+    @@redirect_limit = v
+  end
+  def self.retry_limit=(v)
+    @@retry_limit = v
+  end
+  def self.ssl_timeout=(v)
+    @@ssl_timeout = v
+  end
+  def self.ssl_verify_mode=(v)
+    @@ssl_verify_mode = v
+  end
+  def self.ssl_ca_file=(v)
+    @@ssl_ca_file = v
+  end
+  def self.ssl_verify_depth=(v)
+    @@ssl_verify_depth = v
+  end
+  
+  self.open_timeout     = DEFAULT_OPEN_TIMEOUT
+  self.read_timeout     = DEFAULT_READ_TIMEOUT
+  self.redirect_limit   = DEFAULT_REDIRECT_LIMIT
+  self.retry_limit      = DEFAULT_RETRY_LIMIT
+  self.ssl_timeout      = DEFAULT_SSL_TIMEOUT
+  self.ssl_verify_mode  = DEFAULT_SSL_VERIFY_MODE
+  self.ssl_ca_file      = DEFAULT_SSL_CA_FILE
+  self.ssl_verify_depth = DEFAULT_SSL_VERIFY_DEPTH
   
   
   # 
@@ -53,7 +77,7 @@ class HttpSession
   
   # internally handle GET and POST requests (recursively for redirects and retries)
   # returns Net::HTTPResponse, or raises Timeout::Error, SystemCallError, Net::ProtocolError
-  def request(uri='/', headers={}, type=:get, post_params={}, redirect_limit=REDIRECT_LIMIT, retry_limit=RETRY_LIMIT)
+  def request(uri='/', headers={}, type=:get, post_params={}, redirect_limit=@@redirect_limit, retry_limit=@@retry_limit)
     req = case type
       when :get
         Net::HTTP::Get.new(uri)
@@ -98,14 +122,8 @@ class HttpSession
   # Session initialization and basic handling
   # 
   
-  # store references to all currently-known session instances in here, for singleton method usage
-  def self.sessions
-    @@sessions
-  end
-  def self.sessions=(sesns)
-    @@sessions = sesns
-  end
-  self.sessions = {}
+  # place to store references to all currently-known session instances, for singleton method usage
+  @@sessions = {}
   
   # storage for open session handle, for instance method usage
   attr_accessor :handle
@@ -113,15 +131,15 @@ class HttpSession
   # don't use new() directly, use singleton get() or use() instead
   def initialize(host, use_ssl, port)
     self.handle = Net::HTTP.new(host, port)
-    self.handle.open_timeout    = OPEN_TIMEOUT     # seems to have no effect?
-    self.handle.read_timeout    = READ_TIMEOUT     # seems to have an effect on establishing tcp connection??
+    self.handle.open_timeout    = @@open_timeout     # seems to have no effect?
+    self.handle.read_timeout    = @@read_timeout     # seems to have an effect on establishing tcp connection??
     self.handle.close_on_empty_response = true     # seems to have no effect?
     if use_ssl
       self.handle.use_ssl       = true
-      self.handle.ssl_timeout   = SSL_TIMEOUT
-      self.handle.verify_mode   = SSL_VERIFY_MODE
-      self.handle.ca_file       = SSL_CA_FILE
-      self.handle.verify_depth  = SSL_VERIFY_DEPTH
+      self.handle.ssl_timeout   = @@ssl_timeout
+      self.handle.verify_mode   = @@ssl_verify_mode
+      self.handle.ca_file       = @@ssl_ca_file
+      self.handle.verify_depth  = @@ssl_verify_depth
     end
     self.cookies = {}
   end
@@ -132,19 +150,19 @@ class HttpSession
   end
   
   # check if a session exists yet ot not
-  def self.exists?(host, use_ssl=DEFAULT_USE_SSL, port=nil)
-    sessions.has_key?(key(host, use_ssl, port))
+  def self.exists?(host, use_ssl=false, port=nil)
+    @@sessions.has_key?(key(host, use_ssl, port))
   end
   
   # get the session for the given host and port, nil if there isn't one yet
-  def self.get(host, use_ssl=DEFAULT_USE_SSL, port=nil)
-    sessions[key(host, use_ssl, port)]
+  def self.get(host, use_ssl=false, port=nil)
+    @@sessions[key(host, use_ssl, port)]
   end
   
   # get the session for the given host and port, creating a new one if it doesn't exist
-  def self.use(host, use_ssl=DEFAULT_USE_SSL, port=nil)
+  def self.use(host, use_ssl=false, port=nil)
     key = key(host, use_ssl, port)
-    sessions.has_key?(key) ? sessions[key] : (self.sessions[key] = new(host, use_ssl, port_or_default(port, use_ssl)))
+    @@sessions.has_key?(key) ? @@sessions[key] : (@@sessions[key] = new(host, use_ssl, port_or_default(port, use_ssl)))
   end
   
   # done with this session, close and reset it
@@ -157,7 +175,7 @@ class HttpSession
   # delete session from session storage (you should probably call close on it too, and set all references to nil so it gets garbage collected)
   def delete
     key = self.class.key(handle.address, handle.use_ssl?, handle.port)
-    self.class.sessions.delete(key) if self.class.sessions.has_key?(key)
+    @@sessions.delete(key) if @@sessions.has_key?(key)
   end
   
   # return the given port, or defaults for ssl setting if it's nil
@@ -188,7 +206,7 @@ class HttpSession
     return unless response.key?('set-cookie')
     response.get_fields('set-cookie').each do |cookie|
       (key, val) = cookie.split('; ')[0].split('=', 2)
-      self.cookies[key] = val
+      cookies[key] = val
     end
   end
   
