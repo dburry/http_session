@@ -40,7 +40,7 @@ All the above return:
 * a <tt>Net::HTTPResponse</tt> object in all its glory
 
 Or raise any of the following:
-* <tt>Timeout::Error</tt> or <tt>Errno::*</tt> (<tt>SystemCallError</tt> subclass) or <tt>OpenSSL::SSL::SSLError</tt> - for various connection-related issues
+* <tt>Timeout::Error</tt>, <tt>Errno::*</tt> (<tt>SystemCallError</tt> subclass), <tt>OpenSSL::SSL::SSLError</tt>, or <tt>EOFError</tt> - for various connection-related issues
 * <tt>Net::HTTP*Error/Exception</tt> (<tt>Net::ProtocolError</tt> subclass) - for HTTP response errors
 
 Notes:
