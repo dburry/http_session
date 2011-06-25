@@ -4,24 +4,7 @@ require 'net/https'
 
 class HttpSession
   
-  # default timeout for opening tcp/ip connection, in seconds
-  DEFAULT_OPEN_TIMEOUT      =  4
-  # default timeout for reading bytes from tcp/ip connection, in seconds
-  DEFAULT_READ_TIMEOUT      =  8
-  # default number of redirects to follow before throwing an error
-  DEFAULT_REDIRECT_LIMIT    = 10
-  # default number of times to retry, on connection errors
-  DEFAULT_RETRY_LIMIT       =  1
-  # default ssl timeout
-  DEFAULT_SSL_TIMEOUT       =  2
-  # default kind of ssl certificate verification (should be OpenSSL::SSL::VERIFY_NONE or OpenSSL::SSL::VERIFY_PEER)
-  DEFAULT_SSL_VERIFY_MODE   = OpenSSL::SSL::VERIFY_PEER
-  # when ssl certificate verification is used, where is the certificate authority file
-  # you can get one from curl here: http://curl.haxx.se/ca/cacert.pem
-  DEFAULT_SSL_CA_FILE       = ::File.expand_path('../../share/ca/cacert.pem',  __FILE__)
-  # default ssl verify depth
-  DEFAULT_SSL_VERIFY_DEPTH  =  5
-  
+  # it really sux that plain ruby doesn't have cattr_accessor so we have to do 30 lines of repeating ourselves!
   def self.open_timeout=(v)
     @@open_timeout = v
   end
@@ -47,14 +30,23 @@ class HttpSession
     @@ssl_verify_depth = v
   end
   
-  self.open_timeout     = DEFAULT_OPEN_TIMEOUT
-  self.read_timeout     = DEFAULT_READ_TIMEOUT
-  self.redirect_limit   = DEFAULT_REDIRECT_LIMIT
-  self.retry_limit      = DEFAULT_RETRY_LIMIT
-  self.ssl_timeout      = DEFAULT_SSL_TIMEOUT
-  self.ssl_verify_mode  = DEFAULT_SSL_VERIFY_MODE
-  self.ssl_ca_file      = DEFAULT_SSL_CA_FILE
-  self.ssl_verify_depth = DEFAULT_SSL_VERIFY_DEPTH
+  # timeout for opening tcp/ip connection, in seconds
+  self.open_timeout      =  4
+  # timeout for reading bytes from tcp/ip connection, in seconds
+  self.read_timeout      =  8
+  # number of redirects to follow before throwing an error
+  self.redirect_limit    = 10
+  # number of times to retry, on connection errors
+  self.retry_limit       =  1
+  # ssl timeout
+  self.ssl_timeout       =  2
+  # kind of ssl certificate verification (should be OpenSSL::SSL::VERIFY_NONE or OpenSSL::SSL::VERIFY_PEER)
+  self.ssl_verify_mode   = OpenSSL::SSL::VERIFY_PEER
+  # when ssl certificate verification is used, where is the certificate authority file
+  # you can get one from curl here: http://curl.haxx.se/ca/cacert.pem
+  self.ssl_ca_file       = ::File.expand_path('../../share/ca/cacert.pem',  __FILE__)
+  # ssl verify depth
+  self.ssl_verify_depth  =  5
   
   
   # 
