@@ -9,7 +9,8 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = [%q{David Burry}]
-  s.date = %q{2011-06-25}
+  s.date = %q{2011-06-26}
+  s.description = %q{A useful yet still extremely light-weight web client built on top of Ruby Net::HTTP.  Keeps certain information internally in a session for each host/port used.  Great for simple web page scraping or web service API usage.}
   s.email = %q{dburry@falcon}
   s.extra_rdoc_files = [
     "LICENSE",
@@ -39,8 +40,9 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/dburry/http_session}
   s.licenses = [%q{MIT}]
   s.require_paths = [%q{lib}]
+  s.required_ruby_version = Gem::Requirement.new(">= 1.8.6")
   s.rubygems_version = %q{1.8.5}
-  s.summary = %q{A useful yet still extremely light-weight web client built on top of Ruby Net::HTTP}
+  s.summary = %q{A light-weight web client built on top of Net::HTTP}
 
   if s.respond_to? :specification_version then
     s.specification_version = 3

@@ -30,9 +30,11 @@ else
     gem.name = "http_session"
     gem.homepage = "http://github.com/dburry/http_session"
     gem.license = "MIT"
-    gem.summary = %Q{A useful yet still extremely light-weight web client built on top of Ruby Net::HTTP}
+    gem.summary = %Q{A light-weight web client built on top of Net::HTTP}
+    gem.description = %Q{A useful yet still extremely light-weight web client built on top of Ruby Net::HTTP.  Keeps certain information internally in a session for each host/port used.  Great for simple web page scraping or web service API usage.}
     gem.email = "dburry@falcon"
     gem.authors = ["David Burry"]
+    gem.required_ruby_version = '>= 1.8.6'
     # dependencies defined in Gemfile
   end
   Jeweler::RubygemsDotOrgTasks.new
