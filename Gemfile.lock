@@ -2,13 +2,13 @@ GEM
   remote: http://rubygems.org/
   specs:
     git (1.2.5)
-    jeweler (1.6.2)
+    jeweler (1.6.3)
       bundler (~> 1.0)
       git (>= 1.2.5)
       rake
     rake (0.8.7)
     rcov (0.9.9)
-    rdoc (3.6.1)
+    rdoc (3.8)
     shoulda (2.11.3)
     simplecov (0.4.2)
       simplecov-html (~> 0.4.4)

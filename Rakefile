@@ -17,7 +17,6 @@ puts "\n*** Using #{File.basename(ENV['GEM_HOME'])}" if ENV.has_key?('GEM_HOME')
 #   $stderr.puts "Run `bundle install` to install missing gems"
 #   exit e.status_code
 # end
-require 'rake'
 
 
 begin
@@ -63,8 +62,7 @@ if RUBY_VERSION =~ /^1\.8\./
       test.pattern = 'test/**/test_*.rb'
     end
   end
-end
-if RUBY_VERSION =~ /^1\.9\./
+elsif RUBY_VERSION =~ /^1\.9\./
   begin
     require 'simplecov'
   rescue LoadError
@@ -110,6 +108,7 @@ else
       # edit this list to test on more rubies...
       # though beware that some development dependencies might be troublesome on some versions...
       'ruby-1.9.2-p180',
+      'ruby-1.9.2-p136',
       'ruby-1.9.1-p378',
       'ruby-1.8.7-p330',
       'ruby-1.8.6-p399'
