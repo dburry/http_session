@@ -152,15 +152,17 @@ unless `which curl`.empty?
   namespace :cafile do
     @@cafile_url = 'http://curl.haxx.se/ca/cacert.pem'
     @@cafile_path = 'share/ca/cacert.pem'
-    @@cafile_temp_path = '/tmp/cacert.pem'
-    desc "Update the current cafile from #{@@cafile_url}"
-    task :update do
-      system "curl #{@@cafile_url} -o #{@@cafile_path}"
+    desc "Check if cafile is out of date, compared to #{@@cafile_url}"
+    task :status do
+      system "curl -s #{@@cafile_url} -o - | diff -qs --label #{@@cafile_path} --label #{@@cafile_url} #{@@cafile_path} -"
     end
     desc "Show a diff of the current cafile with #{@@cafile_url}"
     task :diff do
-      system "curl #{@@cafile_url} -o #{@@cafile_temp_path}"
-      system "diff #{@@cafile_path} #{@@cafile_temp_path}"
+      system "curl -s #{@@cafile_url} -o - | diff #{@@cafile_path} -"
+    end
+    desc "Update the current cafile from #{@@cafile_url}"
+    task :update do
+      system "curl -s #{@@cafile_url} -o #{@@cafile_path}"
     end
   end
 end
