@@ -18,7 +18,12 @@ puts "\n*** Using #{File.basename(ENV['GEM_HOME'])}" if ENV.has_key?('GEM_HOME')
 #   exit e.status_code
 # end
 
-
+# some jeweler tasks (like building gem for release) croak on syck now it seems
+begin
+  require 'psych'
+rescue LoadError
+  puts('WARNING: psych not available, defaulting yaml engine to old unmaintained syck')
+end
 begin
   require 'jeweler'
 rescue LoadError
