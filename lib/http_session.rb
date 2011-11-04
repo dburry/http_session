@@ -114,8 +114,12 @@ class HttpSession
   # Session initialization and basic handling
   # 
   
-  # place to store references to all currently-known session instances, for singleton method usage
-  @@sessions = {}
+  # Simplest thread-safe pooling mechanism is to make a separate session store for every thread.
+  # Each thread makes its own connection(s), the way you'd expect that way.
+  # Just don't try to share http_session instances between separate threads, and it will work fine.
+  def self.session_store
+    Thread.current['http_session_sessions'] ||= {}
+  end
   
   # storage for open session handle, for instance method usage
   attr_accessor :handle
@@ -144,18 +148,19 @@ class HttpSession
   
   # check if a session exists yet ot not
   def self.exists?(host, use_ssl=false, port=nil)
-    @@sessions.has_key?(key(host, use_ssl, port))
+    session_store.has_key?(key(host, use_ssl, port))
   end
   
   # get the session for the given host and port, nil if there isn't one yet
   def self.get(host, use_ssl=false, port=nil)
-    @@sessions[key(host, use_ssl, port)]
+    session_store[key(host, use_ssl, port)]
   end
   
   # get the session for the given host and port, creating a new one if it doesn't exist
   def self.use(host, use_ssl=false, port=nil)
-    key = key(host, use_ssl, port)
-    @@sessions.has_key?(key) ? @@sessions[key] : (@@sessions[key] = new(host, use_ssl, port_or_default(port, use_ssl)))
+    exists?(host, use_ssl, port) ?
+      get(host, use_ssl, port) :
+      (session_store[key(host, use_ssl, port)] = new(host, use_ssl, port_or_default(port, use_ssl)))
   end
   
   # done with this session, close and reset it
@@ -167,8 +172,9 @@ class HttpSession
   
   # delete session from session storage (you should probably call close on it too, and set all references to nil so it gets garbage collected)
   def delete
-    key = self.class.key(handle.address, handle.use_ssl?, handle.port)
-    @@sessions.delete(key) if @@sessions.has_key?(key)
+    if self.class.exists?(handle.address, handle.use_ssl?, handle.port)
+      self.class.session_store.delete(self.class.key(handle.address, handle.use_ssl?, handle.port))
+    end
   end
   
   # return the given port, or defaults for ssl setting if it's nil
