@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{http_session}
-  s.version = "0.2.1"
+  s.version = "0.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = [%q{David Burry}]
-  s.date = %q{2011-09-07}
+  s.date = %q{2011-11-06}
   s.description = %q{A useful yet still extremely light-weight web client built on top of Ruby Net::HTTP.  Keeps certain information internally in a session for each host/port used.  Great for simple web page scraping or web service API usage.}
   s.email = %q{dburry@falcon}
   s.extra_rdoc_files = [
