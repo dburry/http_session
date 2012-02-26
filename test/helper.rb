@@ -76,7 +76,7 @@ class Test::Unit::TestCase
       # wait for it to actually quit
       # note: Sometimes it appears to hang here at this join, when there's something wrong with the server or client
       # when that happens just comment out to see more debug info what's wrong
-      # you'll also get some spurrious concurrency errors of course, but at least the problem will show up too
+      # you'll also get some spurious concurrency errors of course, but at least the problem will show up too
       @wbthread.join
     end
   end
