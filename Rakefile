@@ -138,8 +138,8 @@ else
       missing = missing_ruby_versions
       system "rvm install #{missing.join(',')}" unless missing.empty?
       ruby_version_gemsets_string = @@ruby_versions.collect { |r| r + "@#{@@gemset_name}" }.join(',')
-      system "rvm --create #{ruby_version_gemsets_string} gem install bundler"
-      system "rvm #{ruby_version_gemsets_string} exec bundle install"
+      system "rvm --create #{ruby_version_gemsets_string} do gem install bundler"
+      system "rvm #{ruby_version_gemsets_string} do exec bundle install"
     end
     desc "Remove RVM gemsets (leave the Ruby versions installed though)"
     task :cleanup do
