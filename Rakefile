@@ -121,11 +121,14 @@ else
     @@gemset_name = 'http_session'
     def installed_ruby_versions
       current_rubies = `rvm list`
-      ruby_version_gemsets_string = @@ruby_versions.select { |r| current_rubies =~ /\b#{r}\b/ }
+      @@ruby_versions.select { |r| current_rubies =~ /\b#{r}\b/ }
     end
     def missing_ruby_versions
       current_rubies = `rvm list`
-      ruby_version_gemsets_string = @@ruby_versions.select { |r| current_rubies !~ /\b#{r}\b/ }
+      @@ruby_versions.select { |r| current_rubies !~ /\b#{r}\b/ }
+    end
+    def rubies_with_gemsets(rubies)
+      rubies.collect { |r| r + "@#{@@gemset_name}" }.join(',')
     end
     desc "List all the versions of Ruby these tasks use"
     task :list do
@@ -136,7 +139,7 @@ else
     task :setup do
       missing = missing_ruby_versions
       system "rvm install #{missing.join(',')}" unless missing.empty?
-      ruby_version_gemsets_string = @@ruby_versions.collect { |r| r + "@#{@@gemset_name}" }.join(',')
+      ruby_version_gemsets_string = rubies_with_gemsets(@@ruby_versions)
       system "rvm --create #{ruby_version_gemsets_string} do gem install bundler"
       system "rvm #{ruby_version_gemsets_string} do exec bundle install"
     end
@@ -148,8 +151,7 @@ else
     task :test do
       installed = installed_ruby_versions
       puts "WARNING: some rubies are missing from RVM, run `rake rubies:setup` to install them" if installed != @@ruby_versions
-      ruby_version_gemsets_string = installed.collect { |r| r + "@#{@@gemset_name}" }.join(',')
-      system "rvm #{ruby_version_gemsets_string} exec rake test"
+      system "rvm #{rubies_with_gemsets(installed)} do exec rake test"
     end
   end
 end
